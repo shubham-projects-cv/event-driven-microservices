@@ -5,11 +5,17 @@ import {
   updateProduct,
   deleteProduct,
 } from "../services/product.service";
+import { publishProductEvent } from "../kafka/publishers/product.publisher";
 
 export const createCtrl = async (req: FastifyRequest, reply: FastifyReply) => {
   const { name, price } = req.body as { name: string; price: number };
   const userId = (req as any).user.sub;
   const product = await createProduct(userId, name, price);
+  await publishProductEvent("PRODUCT_CREATED", {
+    productId: product.id,
+    userId: req.user.sub,
+  });
+
   reply.code(201).send(product);
 };
 
