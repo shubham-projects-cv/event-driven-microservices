@@ -1,5 +1,9 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { registerUser } from "../services/auth.service";
+import {
+  forgotPassword,
+  registerUser,
+  resetPassword,
+} from "../services/auth.service";
 import { verifyOtp, loginUser } from "../services/auth.service";
 
 export const register = async (
@@ -30,4 +34,16 @@ export const loginCtrl = async (req: any, reply: any) => {
   const { email, password } = req.body as { email: string; password: string };
   const token = await loginUser(email, password);
   reply.send({ token });
+};
+
+export const forgotPasswordCtrl = async (req: any, reply: any) => {
+  const { email } = req.body as { email: string };
+  await forgotPassword(email);
+  reply.send({ message: "If registered, reset link sent" });
+};
+
+export const resetPasswordCtrl = async (req: any, reply: any) => {
+  const { token, password } = req.body as { token: string; password: string };
+  await resetPassword(token, password);
+  reply.send({ message: "Password updated" });
 };

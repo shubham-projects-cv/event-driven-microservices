@@ -7,6 +7,7 @@ import * as jwt from "jsonwebtoken";
 import { comparePassword } from "../utils/password";
 import { env } from "../config/env";
 import { otpExpiry } from "../utils/otp";
+import { generateResetToken, resetExpiry } from "../utils/reset";
 
 export const registerUser = async (
   name: string,
@@ -72,4 +73,38 @@ export const loginUser = async (
   return jwt.sign({ sub: user.id, email: user.email }, env.JWT_SECRET, {
     expiresIn: "1h",
   });
+};
+
+export const forgotPassword = async (email: string): Promise<void> => {
+  const user = await User.findOne({ email });
+  if (!user) return; // silent success
+
+  const token = generateResetToken();
+  user.resetToken = token;
+  user.resetTokenExpiresAt = resetExpiry();
+  await user.save();
+
+  await producer.send({
+    topic: "PASSWORD_RESET_REQUESTED",
+    messages: [{ value: JSON.stringify({ email, token }) }],
+  });
+};
+
+export const resetPassword = async (
+  token: string,
+  newPassword: string,
+): Promise<void> => {
+  const user = await User.findOne({
+    resetToken: token,
+    resetTokenExpiresAt: { $gt: new Date() },
+  });
+
+  if (!user) {
+    throw new AppError("Invalid or expired token", 400);
+  }
+
+  user.password = await hashPassword(newPassword);
+  user.resetToken = undefined;
+  user.resetTokenExpiresAt = undefined;
+  await user.save();
 };
