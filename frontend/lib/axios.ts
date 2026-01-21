@@ -1,8 +1,7 @@
 import axios from "axios";
 
-export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true,
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_PRODUCT_API, // 4001
 });
 
 api.interceptors.request.use((config) => {
@@ -14,3 +13,5 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+export default api;

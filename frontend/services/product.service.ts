@@ -1,82 +1,42 @@
-import axios from "axios";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4001";
-
-/* =======================
-   Types
-======================= */
+import api from "@/lib/axios";
 
 export interface Product {
   _id: string;
   name: string;
   price: number;
   description?: string;
-  userId: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
-export interface CreateProductInput {
-  name: string;
-  price: number;
-  description?: string;
-}
-
-export interface UpdateProductInput {
-  name: string;
-  price: number;
-  description?: string;
-}
-
-/* =======================
-   Axios instance
-======================= */
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  withCredentials: true,
-});
-
-api.interceptors.request.use((config) => {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
-
-/* =======================
-   API functions
-======================= */
-
-export const createProduct = async (
-  data: CreateProductInput,
-): Promise<Product> => {
-  const res = await api.post<Product>("/products", data);
+/* GET ALL */
+export const getProducts = async (): Promise<Product[]> => {
+  const res = await api.get("/products");
   return res.data;
 };
 
+/* GET ONE */
 export const getProduct = async (id: string): Promise<Product> => {
-  const res = await api.get<Product>(`/products/${id}`);
+  const res = await api.get(`/products/${id}`);
   return res.data;
 };
 
+/* CREATE */
+export const createProduct = async (
+  data: Omit<Product, "_id">,
+): Promise<Product> => {
+  const res = await api.post("/products", data);
+  return res.data;
+};
+
+/* UPDATE */
 export const updateProduct = async (
   id: string,
-  data: UpdateProductInput,
+  data: Partial<Product>,
 ): Promise<Product> => {
-  const res = await api.put<Product>(`/products/${id}`, data);
+  const res = await api.put(`/products/${id}`, data);
   return res.data;
 };
 
+/* DELETE */
 export const deleteProduct = async (id: string): Promise<void> => {
   await api.delete(`/products/${id}`);
-};
-
-export const getProducts = async (): Promise<Product[]> => {
-  const res = await api.get<Product[]>("/products");
-  return res.data;
 };

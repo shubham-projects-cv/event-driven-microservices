@@ -1,18 +1,34 @@
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { toast } from "sonner";
-
 import {
+  loginUser,
   registerUser,
   verifyOtp,
-  loginUser,
   forgotPassword,
   resetPassword,
-} from "@/services/auth.service";
+  LoginResponse,
+} from "@/services/auth.api";
 
 interface ApiError {
   message: string;
 }
+
+export const useLogin = () =>
+  useMutation<
+    LoginResponse,
+    AxiosError<ApiError>,
+    { email: string; password: string }
+  >({
+    mutationFn: loginUser,
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.token);
+      toast.success("Login successful");
+    },
+    onError: (error) => {
+      toast.error(error.response?.data.message ?? "Login failed");
+    },
+  });
 
 export const useRegister = () =>
   useMutation({
@@ -28,26 +44,14 @@ export const useVerifyOtp = () =>
     mutationFn: verifyOtp,
     onSuccess: () => toast.success("Account verified"),
     onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data.message ?? "Invalid or expired OTP");
-    },
-  });
-
-export const useLogin = () =>
-  useMutation({
-    mutationFn: loginUser,
-    onSuccess: (res) => {
-      localStorage.setItem("token", res.data.token);
-      toast.success("Login successful");
-    },
-    onError: (error: AxiosError<ApiError>) => {
-      toast.error(error.response?.data.message ?? "Login failed");
+      toast.error(error.response?.data.message ?? "Invalid OTP");
     },
   });
 
 export const useForgotPassword = () =>
   useMutation({
     mutationFn: ({ email }: { email: string }) => forgotPassword(email),
-    onSuccess: () => toast.success("Reset link sent to email"),
+    onSuccess: () => toast.success("Reset link sent"),
   });
 
 export const useResetPassword = () =>

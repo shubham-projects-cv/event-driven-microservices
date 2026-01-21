@@ -1,16 +1,37 @@
-import { api } from "@/lib/axios";
+import api from "@/lib/axios";
 
-export const getProducts = () => api.get("/products").then((res) => res.data);
-
-export const createProduct = (data: {
+export interface Product {
+  _id: string;
   name: string;
   price: number;
   description?: string;
-}) => api.post("/products", data);
+}
 
-export const updateProduct = (
+export const getProducts = async (): Promise<Product[]> => {
+  const res = await api.get("/products");
+  return res.data;
+};
+
+export const getProduct = async (id: string): Promise<Product> => {
+  const res = await api.get(`/products/${id}`);
+  return res.data;
+};
+
+export const createProduct = async (
+  data: Omit<Product, "_id">,
+): Promise<Product> => {
+  const res = await api.post("/products", data);
+  return res.data;
+};
+
+export const updateProduct = async (
   id: string,
-  data: { name?: string; price?: number },
-) => api.put(`/products/${id}`, data);
+  data: Partial<Product>,
+): Promise<Product> => {
+  const res = await api.put(`/products/${id}`, data);
+  return res.data;
+};
 
-export const deleteProduct = (id: string) => api.delete(`/products/${id}`);
+export const deleteProduct = async (id: string): Promise<void> => {
+  await api.delete(`/products/${id}`);
+};

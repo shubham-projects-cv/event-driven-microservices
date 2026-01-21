@@ -1,4 +1,13 @@
-import { api } from "@/lib/axios";
+import api from "@/lib/axios";
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+}
 
 export interface RegisterPayload {
   name: string;
@@ -11,21 +20,28 @@ export interface VerifyOtpPayload {
   otp: string;
 }
 
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
+export const loginUser = async (
+  payload: LoginPayload,
+): Promise<LoginResponse> => {
+  const res = await api.post<LoginResponse>("/auth/login", payload);
+  return res.data;
+};
 
-export const registerUser = (data: RegisterPayload) =>
-  api.post("/auth/register", data);
+export const registerUser = async (payload: RegisterPayload): Promise<void> => {
+  await api.post("/auth/register", payload);
+};
 
-export const verifyOtp = (data: VerifyOtpPayload) =>
-  api.post("/auth/verify-otp", data);
+export const verifyOtp = async (payload: VerifyOtpPayload): Promise<void> => {
+  await api.post("/auth/verify-otp", payload);
+};
 
-export const loginUser = (data: LoginPayload) => api.post("/auth/login", data);
+export const forgotPassword = async (email: string): Promise<void> => {
+  await api.post("/auth/forgot-password", { email });
+};
 
-export const forgotPassword = (email: string) =>
-  api.post("/auth/forgot-password", { email });
-
-export const resetPassword = (token: string, password: string) =>
-  api.post("/auth/reset-password", { token, password });
+export const resetPassword = async (
+  token: string,
+  password: string,
+): Promise<void> => {
+  await api.post("/auth/reset-password", { token, password });
+};
