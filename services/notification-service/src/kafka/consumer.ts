@@ -1,6 +1,7 @@
 import { Kafka } from "kafkajs";
 import { env } from "../env";
 import { TOPICS } from "./topics";
+import { transporter } from "../mailer";
 
 const kafka = new Kafka({
   clientId: "notification-service",
@@ -14,21 +15,47 @@ export const consumer = kafka.consumer({
 export const startNotificationConsumer = async () => {
   await consumer.connect();
 
-  // 🔥 SUBSCRIBE FIRST — ALWAYS
   await consumer.subscribe({ topic: TOPICS.USER_OTP_CREATED });
   await consumer.subscribe({ topic: TOPICS.USER_LOGGED_IN });
   await consumer.subscribe({ topic: TOPICS.PASSWORD_RESET_REQUESTED });
-  await consumer.subscribe({ topic: TOPICS.PRODUCT_CREATED });
-  await consumer.subscribe({ topic: TOPICS.PRODUCT_UPDATED });
-  await consumer.subscribe({ topic: TOPICS.PRODUCT_DELETED });
 
   await consumer.run({
     eachMessage: async ({ topic, message }) => {
-      const data = JSON.parse(message.value!.toString());
+      if (!message.value) return;
 
-      console.log("📩 NOTIFICATION EVENT");
-      console.log("Topic:", topic);
-      console.log("Data:", data);
+      const data = JSON.parse(message.value.toString());
+
+      console.log("📩 EVENT:", topic, data);
+
+      // ✅ OTP EMAIL
+      if (topic === TOPICS.USER_OTP_CREATED) {
+        await transporter.sendMail({
+          from: env.EMAIL_FROM,
+          to: data.payload.email, // 🔥 FIX
+          subject: "Verify your account",
+          html: `<h2>Your OTP is ${data.payload.otp}</h2>`,
+        });
+      }
+
+      // ✅ LOGIN ALERT
+      if (topic === TOPICS.USER_LOGGED_IN) {
+        await transporter.sendMail({
+          from: env.EMAIL_FROM,
+          to: data.payload.email, // 🔥 FIX
+          subject: "Login Alert",
+          html: `<p>You logged in successfully.</p>`,
+        });
+      }
+
+      // ✅ PASSWORD RESET
+      if (topic === TOPICS.PASSWORD_RESET_REQUESTED) {
+        await transporter.sendMail({
+          from: env.EMAIL_FROM,
+          to: data.payload.email, // 🔥 FIX
+          subject: "Reset Password",
+          html: `<p>Reset token: ${data.payload.token}</p>`,
+        });
+      }
     },
   });
 };

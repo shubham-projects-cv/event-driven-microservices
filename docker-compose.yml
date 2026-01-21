@@ -5,8 +5,6 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
 
   kafka:
     image: confluentinc/cp-kafka:7.6.1
@@ -18,41 +16,45 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-
-      # ✅ CRITICAL — DO NOT CHANGE
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
 
   auth-service:
     build: ./services/auth-service
     container_name: auth-service
-    depends_on:
-      - kafka
-    env_file:
-      - ./services/auth-service/.env
     ports:
       - "4000:4000"
+    depends_on:
+      - kafka
+    environment:
+      AUTH_SERVICE_PORT: "4000"
+      MONGO_URI: "mongodb+srv://shjp_db_user:3ZLdv1TSXzrOnPEW@cluster0.tib49hu.mongodb.net/authdb?appName=Cluster0"
+      JWT_SECRET: "super_secure_key_1234567890_abcdefghijklmnopqrstuvwxyz"
+      KAFKA_BROKER: kafka:9092
 
   product-service:
     build: ./services/product-service
     container_name: product-service
-    depends_on:
-      - kafka
-    env_file:
-      - ./services/product-service/.env
     ports:
       - "4001:4001"
+    depends_on:
+      - kafka
+    environment:
+      PRODUCT_SERVICE_PORT: "4001"
+      MONGO_URI: "mongodb+srv://shjp_db_user:3ZLdv1TSXzrOnPEW@cluster0.tib49hu.mongodb.net/productdb?appName=Cluster0"
+      JWT_SECRET: "super_secure_key_1234567890_abcdefghijklmnopqrstuvwxyz"
+      KAFKA_BROKER: kafka:9092
 
   notification-service:
     build: ./services/notification-service
     container_name: notification-service
     depends_on:
       - kafka
-    env_file:
-      - ./services/notification-service/.env
+    environment:
+      KAFKA_BROKER: kafka:9092
+      EMAIL_FROM: parab16aug@gmail.com
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: "587"
+      SMTP_USER: parab16aug@gmail.com
+      SMTP_PASS: xiphvqkljnfxjrqc
