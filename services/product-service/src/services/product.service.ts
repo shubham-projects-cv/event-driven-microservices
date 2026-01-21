@@ -42,9 +42,20 @@ export const updateProduct = async (
   return product;
 };
 
-export const deleteProduct = async (userId: string, productId: string) => {
+// export const deleteProduct = async (userId: string, productId: string) => {
+//   const product = await Product.findOneAndDelete({
+//     _id: productId,
+//     userId,
+//   });
+
+//   if (!product) {
+//     throw new Error("Product not found");
+//   }
+// };
+
+export const deleteProduct = async (userId: string, id: string) => {
   const product = await Product.findOneAndDelete({
-    _id: productId,
+    _id: id,
     userId,
   });
 
