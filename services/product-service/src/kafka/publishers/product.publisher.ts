@@ -1,11 +1,12 @@
 import { producer } from "../producer";
+import { PRODUCT_TOPICS } from "../topics";
 
 export const publishProductEvent = async (
-  topic: "PRODUCT_CREATED" | "PRODUCT_UPDATED" | "PRODUCT_DELETED",
-  payload: Record<string, any>,
+  topic: keyof typeof PRODUCT_TOPICS,
+  payload: Record<string, unknown>,
 ) => {
   await producer.send({
-    topic,
+    topic: PRODUCT_TOPICS[topic],
     messages: [
       {
         value: JSON.stringify({
