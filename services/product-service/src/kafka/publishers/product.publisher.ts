@@ -3,7 +3,7 @@ import { PRODUCT_TOPICS } from "../topics";
 
 export const publishProductEvent = async (
   topic: keyof typeof PRODUCT_TOPICS,
-  payload: Record<string, unknown>,
+  payload: Record<string, any>,
 ) => {
   await producer.send({
     topic: PRODUCT_TOPICS[topic],
