@@ -20,15 +20,15 @@ export default function LoginPage() {
       {
         onSuccess: (data) => {
           localStorage.setItem("token", data.token);
-          router.replace("/auth/products"); // ✅ CORRECT
+          router.replace("/auth/products");
         },
       },
     );
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <Card className="w-full max-w-md">
+    <div className="flex justify-center py-24">
+      <Card className="w-full max-w-md shadow-lg">
         <CardHeader>
           <h2 className="text-xl font-semibold">Login</h2>
         </CardHeader>

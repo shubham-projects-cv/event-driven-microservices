@@ -1,28 +1,36 @@
-import api from "@/lib/axios";
+import authApi from "@/lib/axios-auth";
 
 export const registerUser = async (payload: {
   name: string;
   email: string;
   password: string;
 }) => {
-  return api.post("/auth/register", payload);
+  const res = await authApi.post("/auth/register", payload);
+  return res.data;
 };
 
 export const verifyOtp = async (payload: { email: string; otp: string }) => {
-  return api.post("/auth/verify-otp", payload);
+  const res = await authApi.post("/auth/verify-otp", payload);
+  return res.data;
 };
 
 export const loginUser = async (payload: {
   email: string;
   password: string;
 }) => {
-  return api.post("/auth/login", payload);
+  const res = await authApi.post("/auth/login", payload);
+  return res.data;
 };
 
 export const forgotPassword = async (email: string) => {
-  return api.post("/auth/forgot-password", { email });
+  const res = await authApi.post("/auth/forgot-password", { email });
+  return res.data;
 };
 
 export const resetPassword = async (token: string, password: string) => {
-  return api.post("/auth/reset-password", { token, password });
+  const res = await authApi.post("/auth/reset-password", {
+    token,
+    password,
+  });
+  return res.data;
 };

@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="text-center py-4 text-sm text-gray-500">
+    <footer className="border-t py-3 text-center text-sm text-muted-foreground">
       © 2025 Product App
     </footer>
   );

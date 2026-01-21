@@ -1,4 +1,5 @@
-import api from "@/lib/axios";
+// frontend/services/auth.api.ts
+import authApi from "@/lib/axios-auth";
 
 export interface LoginPayload {
   email: string;
@@ -23,25 +24,25 @@ export interface VerifyOtpPayload {
 export const loginUser = async (
   payload: LoginPayload,
 ): Promise<LoginResponse> => {
-  const res = await api.post<LoginResponse>("/auth/login", payload);
+  const res = await authApi.post<LoginResponse>("/auth/login", payload);
   return res.data;
 };
 
 export const registerUser = async (payload: RegisterPayload): Promise<void> => {
-  await api.post("/auth/register", payload);
+  await authApi.post("/auth/register", payload);
 };
 
 export const verifyOtp = async (payload: VerifyOtpPayload): Promise<void> => {
-  await api.post("/auth/verify-otp", payload);
+  await authApi.post("/auth/verify-otp", payload);
 };
 
 export const forgotPassword = async (email: string): Promise<void> => {
-  await api.post("/auth/forgot-password", { email });
+  await authApi.post("/auth/forgot-password", { email });
 };
 
 export const resetPassword = async (
   token: string,
   password: string,
 ): Promise<void> => {
-  await api.post("/auth/reset-password", { token, password });
+  await authApi.post("/auth/reset-password", { token, password });
 };

@@ -1,27 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const isAuth =
+    typeof window !== "undefined" && !!localStorage.getItem("token");
 
   const logout = () => {
     localStorage.removeItem("token");
-    router.push("/auth/login");
+    router.replace("/auth/login");
   };
 
   return (
-    <nav className="flex justify-between items-center px-6 py-4 bg-black text-white">
-      <Link href="/auth/products" className="font-bold hover:text-gray-300">
-        Products
-      </Link>
-      <button
-        onClick={logout}
-        className="px-4 py-2 rounded bg-red-600 hover:bg-red-700"
-      >
-        Logout
-      </button>
+    <nav className="flex items-center justify-between border-b px-6 py-4">
+      <h1 className="text-lg font-semibold">Product App</h1>
+
+      <div className="flex gap-3">
+        {isAuth ? (
+          <>
+            <Link href="/auth/products">
+              <Button variant="ghost">Products</Button>
+            </Link>
+            <Button variant="destructive" onClick={logout}>
+              Logout
+            </Button>
+          </>
+        ) : (
+          pathname !== "/auth/login" && (
+            <Link href="/auth/login">
+              <Button variant="ghost">Login</Button>
+            </Link>
+          )
+        )}
+      </div>
     </nav>
   );
 }
