@@ -11,9 +11,13 @@ export const buildApp = async () => {
 
   // ✅ CORS — THIS IS THE FIX
   await app.register(cors, {
-    origin: "http://localhost:3000",
-    credentials: true,
+    origin: [
+      "http://localhost:3000",
+      "https://microservices-frontend-woad.vercel.app",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   });
 
   // MongoDB
