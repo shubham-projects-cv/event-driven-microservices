@@ -11,7 +11,7 @@ export const buildApp = async () => {
 
   // ✅ CORS — THIS IS ENOUGH
   await app.register(cors, {
-    origin: ["http://localhost:3000", "https://microservices-frontend-woad.vercel.app"],
+    origin: ["http://localhost:3000", "http://54.196.145.91:3000"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
