@@ -9,17 +9,12 @@ import { connectProducer } from "./kafka/producer";
 export const buildApp = async () => {
   const app = Fastify({ logger: true });
 
-  // ✅ CORS (MUST be FIRST)
+  // ✅ CORS — THIS IS ENOUGH
   await app.register(cors, {
     origin: ["http://localhost:3000", "https://microservices-frontend-woad.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-  });
-
-  // ✅ Allow preflight explicitly (safe for Fastify)
-  app.options("*", async (_request, reply) => {
-    reply.send();
   });
 
   // ✅ PUBLIC
