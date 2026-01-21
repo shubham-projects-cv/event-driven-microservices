@@ -1,15 +1,14 @@
 import { producer } from "../producer";
 
 export const publishProductEvent = async (
-  type: string,
+  topic: "PRODUCT_CREATED" | "PRODUCT_UPDATED" | "PRODUCT_DELETED",
   payload: Record<string, any>,
 ) => {
   await producer.send({
-    topic: "product.events",
+    topic,
     messages: [
       {
         value: JSON.stringify({
-          type,
           payload,
           timestamp: new Date().toISOString(),
         }),

@@ -1,32 +1,30 @@
 import { Kafka } from "kafkajs";
+import { env } from "../env";
+import { TOPICS } from "./topics";
 
 const kafka = new Kafka({
   clientId: "notification-service",
-  brokers: ["kafka:9092"], // HARDCODED – correct for docker network
+  brokers: [env.KAFKA_BROKER],
 });
 
-const consumer = kafka.consumer({
+export const consumer = kafka.consumer({
   groupId: "notification-service",
 });
 
 export const startNotificationConsumer = async () => {
   await consumer.connect();
 
-  await consumer.subscribe({ topic: "USER_OTP_CREATED", fromBeginning: false });
-  await consumer.subscribe({ topic: "USER_LOGGED_IN", fromBeginning: false });
-  await consumer.subscribe({
-    topic: "PASSWORD_RESET_REQUESTED",
-    fromBeginning: false,
-  });
-  await consumer.subscribe({ topic: "PRODUCT_CREATED", fromBeginning: false });
-  await consumer.subscribe({ topic: "PRODUCT_UPDATED", fromBeginning: false });
-  await consumer.subscribe({ topic: "PRODUCT_DELETED", fromBeginning: false });
+  // 🔥 SUBSCRIBE FIRST — ALWAYS
+  await consumer.subscribe({ topic: TOPICS.USER_OTP_CREATED });
+  await consumer.subscribe({ topic: TOPICS.USER_LOGGED_IN });
+  await consumer.subscribe({ topic: TOPICS.PASSWORD_RESET_REQUESTED });
+  await consumer.subscribe({ topic: TOPICS.PRODUCT_CREATED });
+  await consumer.subscribe({ topic: TOPICS.PRODUCT_UPDATED });
+  await consumer.subscribe({ topic: TOPICS.PRODUCT_DELETED });
 
   await consumer.run({
     eachMessage: async ({ topic, message }) => {
-      if (!message.value) return;
-
-      const data = JSON.parse(message.value.toString());
+      const data = JSON.parse(message.value!.toString());
 
       console.log("📩 NOTIFICATION EVENT");
       console.log("Topic:", topic);

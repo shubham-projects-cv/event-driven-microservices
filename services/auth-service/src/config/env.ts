@@ -2,8 +2,14 @@ import { z } from "zod";
 
 const envSchema = z.object({
   AUTH_SERVICE_PORT: z.string().transform(Number),
-  MONGO_URI: z.string().url(),
-  JWT_SECRET: z.string().min(32),
+  MONGO_URI: z
+    .string()
+    .regex(
+      /^mongodb(\+srv)?:\/\/.+/,
+      "MONGO_URI must be a valid MongoDB connection string (starting with mongodb:// or mongodb+srv://)",
+    ),
+
+  JWT_SECRET: z.string(),
   KAFKA_BROKER: z.string(),
 });
 

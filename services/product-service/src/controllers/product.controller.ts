@@ -12,7 +12,7 @@ export const createCtrl = async (req: FastifyRequest, reply: FastifyReply) => {
   const userId = (req as any).user.sub;
   const product = await createProduct(userId, name, price);
   await publishProductEvent("PRODUCT_CREATED", {
-    productId: product.id,
+    productId: product._id.toString(),
     userId: req.user.sub,
   });
 
